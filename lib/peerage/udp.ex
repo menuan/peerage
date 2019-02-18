@@ -46,7 +46,7 @@ defmodule Peerage.Via.Udp do
     __MODULE__ |> GenServer.whereis |> do_poll
   end
   defp do_poll(pid) when is_pid(pid), do: __MODULE__ |> GenServer.call(:poll)
-  defp do_poll(_),                    do: Logger.debug "(no server)"; []
+  defp do_poll(_),                    do: if Peerage.log_results, do: Logger.log(:debug, fn -> "(no server)" end); []
 
   @doc "Server function: returns list of node names we've seen."
   def handle_call(:poll, _, state = %{seen: ms}), do: {:reply, MapSet.to_list(ms), state}
@@ -62,7 +62,9 @@ defmodule Peerage.Via.Udp do
 
   @doc "Handle UDP packet. If it's a node name broadcast, adds to `state.seen`."
   def handle_info({:udp,sock,_,_, "Peer:" <> name}, state = %{seen: ms}) do
-    Logger.debug "  -> Peerage.Via.Udp sees: #{ name }"
+    if Peerage.log_results do
+      Logger.log(:debug, fn -> "  -> Peerage.Via.Udp sees: #{ name }" end)
+    end
     :inet.setopts(sock, active: 1)
     {:noreply, %{state | seen: ms |> MapSet.put(name |> String.to_atom)}}
   end

@@ -51,8 +51,8 @@ defmodule Peerage do
 
   defp children(_srv = false), do: [worker(Peerage.Server,[])]
   defp children(_srv = true),  do: [worker(Peerage.Server,[]), worker(provider(),[])]
-
-  defp provider, do: Application.get_env(:peerage, :via, Peerage.Via.Self)
-  defp serves?,  do: Application.get_env(:peerage, :serves, false)
-
+  
+  defp provider,    do: Application.get_env(:peerage, :via, Peerage.Via.Self)
+  defp serves?,     do: Application.get_env(:peerage, :serves, false)
+  def log_results, do: Application.get_env(:peerage, :log_results, false)
 end

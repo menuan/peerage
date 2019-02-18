@@ -34,7 +34,9 @@ defmodule Peerage.Via.Dns do
 
   # turn list of ips into list of node names
   defp to_names([ip | rest], acc) when is_list(acc) do
-    Logger.debug " -> Peerage.Via.Dns resolved '#{hostname()}' to #{ to_s(ip) } "
+    if Peerage.log_results do
+      Logger.log(:debug, fn -> " -> Peerage.Via.Dns resolved '#{hostname()}' to #{ to_s(ip) } " end)
+    end
     to_names rest, [:"#{ app_name() }@#{ to_s(ip) }"] ++ acc
   end
   defp to_names([], lst), do: lst
